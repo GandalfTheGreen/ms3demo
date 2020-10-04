@@ -16,30 +16,46 @@ def parse_key(info, key_name):
 
 def factory_json_communication(obj):
     json_info = []
-    for d in obj:
-        my_json = {
-            "type": parse_key(d, "type"),
-            "value": parse_key(d, "value"),
-            "preferred": parse_key(d, "preferred")
-        }
-        json_info.append(my_json)
-    return json_info
+    try:
+        for d in obj:
+            my_json = {
+                "type": parse_key(d, "type"),
+                "value": parse_key(d, "value"),
+                "preferred": parse_key(d, "preferred")
+            }
+            json_info.append(my_json)
+
+    except IndexError as error:
+        return None
+
+    if not json_info:
+        return None
+    else:
+        return json_info
 
 
 def factory_json_address(obj):
     json_info = []
-    for d in obj:
-        my_json = {
-            "box": parse_key(d, "box"),
-            "street": parse_key(d, "street"),
-            "city": parse_key(d, "city"),
-            "state": parse_key(d, "state"),
-            "zip": parse_key(d, "zip"),
-            "country": parse_key(d, "country"),
-            "type": parse_key(d, "type")
-        }
-        json_info.append(my_json)
-    return json_info
+    try:
+        for d in obj:
+            my_json = {
+                "box": parse_key(d, "box"),
+                "street": parse_key(d, "street"),
+                "city": parse_key(d, "city"),
+                "state": parse_key(d, "state"),
+                "zip": parse_key(d, "zip"),
+                "country": parse_key(d, "country"),
+                "type": parse_key(d, "type")
+            }
+            json_info.append(my_json)
+
+    except IndexError as error:
+        return None
+
+    if not json_info:
+        return None
+    else:
+        return json_info
 
 
 def factory_json_identification(d):
@@ -135,14 +151,32 @@ def delete_contact(event):
         }
 
 
+# def get_json_tree_branch(event, branch_name):
+#     try:
+#         x = event[branch_name]
+#         if x == '':
+#             return [{}]
+#
+#     except IndexError as error:
+#         return [{}]
+#     else:
+#         return [{}]
+
+
 # Main for AWS Lambda.
 def lambda_handler(event, context):
     # blank contact template
     person_json = {"contactId": 0, "identification": {}, "address": [], "communication": []}
 
     # Validate the data, and construct a new JSON contact object.
-    person_json["communication"].append(factory_json_communication(event['communication'])[0])
-    person_json["address"].append(factory_json_address(event['address'])[0])
+    c_json = factory_json_communication(event['communication'])
+    if c_json is not None:
+        person_json["communication"].extend(c_json)
+
+    p_json = factory_json_address(event['address'])
+    if p_json is not None:
+        person_json["address"].extend(p_json)
+
     person_json["identification"] = factory_json_identification(event['identification'])
     person_json["contactId"] = factory_json_contact_id(event)
 
