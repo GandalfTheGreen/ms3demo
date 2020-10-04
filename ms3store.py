@@ -151,18 +151,6 @@ def delete_contact(event):
         }
 
 
-# def get_json_tree_branch(event, branch_name):
-#     try:
-#         x = event[branch_name]
-#         if x == '':
-#             return [{}]
-#
-#     except IndexError as error:
-#         return [{}]
-#     else:
-#         return [{}]
-
-
 # Main for AWS Lambda.
 def lambda_handler(event, context):
     # blank contact template
